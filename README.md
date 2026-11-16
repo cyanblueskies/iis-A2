@@ -82,7 +82,8 @@ lines, and cut the README from a second report to this page.
 ## Files
 
 [`docs/decisions.md`](docs/decisions.md) — design notes, concept mapping, open questions.
-[`docs/screenshots/`](docs/screenshots) — the eight states used in the report.
+[`docs/screenshots/`](docs/screenshots) — the eight states and three storyboards used in the report.
+[`docs/report/`](docs/report) — the submitted report (`A2-report.pdf`) and the HTML source it was printed from.
 
 No API key is needed and none is committed. A real adapter would read its key from an environment
 variable at build time.

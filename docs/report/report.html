@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ask now or undo later? — project report</title>
+<style>
+  @page { size: A4; margin: 15mm 15mm 13mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0; color: #14181d;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10.1pt; line-height: 1.42;
+  }
+  h1 { font-size: 17pt; line-height: 1.15; margin: 0 0 2mm; letter-spacing: -0.01em; }
+  .sub { font-size: 10pt; color: #4b5563; margin: 0 0 3mm; }
+  .meta { font-size: 8.6pt; color: #6b7280; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;
+          padding: 2mm 0; margin-bottom: 5mm; display: flex; gap: 10mm; }
+  h2 { font-size: 11pt; margin: 6mm 0 1.6mm; letter-spacing: 0.01em; }
+  h3 { font-size: 10pt; margin: 3.6mm 0 1mm; color: #1f2937; }
+  p { margin: 0 0 2.2mm; text-align: justify; hyphens: auto; }
+  .abstract { background: #f7f8fa; border-left: 2.5pt solid #111827; padding: 3mm 4mm 2mm; margin-bottom: 4mm; }
+  .abstract p { margin-bottom: 0; }
+  figure { margin: 3mm 0 4mm; break-inside: avoid; }
+  figure img { width: 100%; display: block; border: 0; }
+  .figcap { font-size: 8.2pt; color: #4b5563; margin-top: 1.6mm; line-height: 1.3; }
+  .figcap b { color: #111827; }
+  table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin: 2mm 0 3mm; }
+  th { text-align: left; font-weight: 600; color: #374151; border-bottom: 1pt solid #9ca3af; padding: 1.4mm 1.6mm; }
+  td { border-bottom: 0.5pt solid #e5e7eb; padding: 1.6mm; vertical-align: top; color: #1f2937; }
+  td.st { white-space: nowrap; font-size: 8pt; color: #4b5563; }
+  .refs { font-size: 8.2pt; color: #374151; }
+  .refs p { margin: 0 0 1.4mm; padding-left: 5mm; text-indent: -5mm; text-align: left; }
+  .note { font-size: 8.4pt; color: #6b7280; }
+  code { font-family: "SF Mono", Menlo, monospace; font-size: 8.5pt; background: #f1f3f5; padding: 0 1mm; border-radius: 1mm; }
+  .pb { break-before: page; }
+  figure.sb { margin: 3mm auto 3.5mm; width: 82%; }
+</style>
+</head>
+<body>
+
+<h1>Ask now or undo later?<br>Confirming or undoing an assistant’s change to a shared meeting</h1>
+<p class="sub">Intelligent Interactive Systems · Assignment 2 · project report</p>
+
+<div class="meta">
+  <span><b>Report word count:</b> <span id="wc">1,281</span> words (main <span id="wcmain">1,080</span> + abstract <span id="wcabs">201</span>)</span>
+  <span><b>Prototype:</b> github.com/cyanblueskies/iis-A2</span>
+</div>
+
+<div class="abstract" id="abstract">
+<h2 style="margin-top:0">Abstract</h2>
+<p>When an AI assistant reschedules a shared meeting it changes plans for people who never approved the change. Asking first lets the organiser inspect the change but interrupts them. Undoing afterwards avoids the interruption, but the mistake is then found after attendees have read a time that no longer exists, and restoring a calendar entry does not recall a message already opened. Assignment 1 identified that asymmetry and proposed a study; this project builds the situation instead. A working prototype runs one request under two oversight rules — confirm before acting, and act with a thirty-second undo — against a simulated six-person meeting. The assistant parses the request into a proposal, shows the four assumptions behind it, runs five checks before touching the calendar, and records what each attendee has seen. Undoing at twelve seconds restores the entry and leaves three attendees holding a time that has gone. The interaction, the checks, the ledger and the undo window are implemented; the calendar service, the attendees and the model are simulated; a correction message is planned. The prototype does not measure whether undo reduces oversight effort. It makes the consequence of that choice inspectable, which is what the study would then have to measure.</p>
+</div>
+
+<h2>1. What was built, and how far it goes</h2>
+<p>Assignment 1 proposed a laboratory comparison of pre-action approval and post-action undo. Four days and no participants cannot produce it honestly, so the project changed shape: instead of measuring the difference it instantiates both rules on one task, so the asymmetry can be seen rather than argued. One chain is built end to end — typed request, proposal, five checks, executed change, notification ledger, then either a confirmation or a thirty-second undo. Under <b>confirm</b>, nothing happens until the person approves and there is no undo afterwards; under <b>undo</b>, the calendar and six updates change at once, and thirty seconds remain to restore the entry. The calendar service, attendees, delivery and model are simulated; the parser, checks, engine and undo window are real code; a correction message is planned and marked. Figure 1 shows the components and their status.</p>
+
+<h2>2. Design rationale</h2>
+
+<h3>The comparison is the artefact</h3>
+<p>Making the two rules a switch rather than a setting is the central choice. Horvitz (1999) frames acting and asking as a decision under uncertainty about attention and the cost of a wrong action, and Shneiderman’s framework keeps automation and human control separate rather than trading one for the other. Neither settles what to do when the cost falls on someone outside the dialogue, and a single-rule artefact could not show it. Two rules on one task let an identical request produce both consequences within a minute.</p>
+
+<h3>The social cost is an object, not a sentence</h3>
+<p>The notification side effect is on by default, marked “not requested” and editable, because the part that escapes control is a policy default, not a decision the person made. Amershi et al. (2019, G11) ask systems to explain why they acted; here the explanation is a list of who has read what. The course’s reversibility-by-visibility distinction (Lecture 12, after Shneiderman, 1983) sets the rule — reversible and visible, do it and show it; irreversible and invisible, confirm — and the ledger is how visibility survives the action.</p>
+
+<h3>Where the three claims from Assignment 1 land</h3>
+<p>Assignment 1’s sources still frame the choice. Zhou et al. (2026) price a late check as rework inside the task; Cranshaw et al. (2017) and Endacott (2024) show the cost landing outside the task, on invitees and on the organiser’s sense of control; Haggard (2017) explains why restoring an entry does not restore the feeling of having acted. The prototype puts all three on one screen: the rework is the timer, the outside cost is the ledger, the agency is the sentence that three attendees now hold a time that has gone. Assignment 1 feedback asked for tighter source-to-claim links, so each row carries one source.</p>
+
+<h3>The window is a threshold, not a measurement</h3>
+<p>Thirty seconds trades one error for another, and Lecture 04’s signal-detection framing applies: the window does not improve how well the system knows the move is right, only how the two costs are balanced.</p>
+
+<h3>Assumptions instead of a confidence score</h3>
+<p>The proposal reports four assumptions and no score. A number would look calibrated and would not be; four lines the person can check — “morning is 09:00”, “duration kept”, “attendees notified”, “Friday of this week” — are what Lecture 09 calls a specification in which every omitted part becomes a silent decision. Showing them before the action answers Lecture 02’s claim that every inference is a bet.</p>
+
+<h3>The boundary is in code, and the screen is not the claim</h3>
+<p>Five checks — shape, permission, precondition, confirmation, idempotency — run before anything executes, and the result panel is built from the ledger rather than from the assistant’s summary. Lecture 12 separates the model’s proposal from the system’s decision: here the model cannot execute anything, and “done” appears only once the service has said so.</p>
+
+<table>
+  <thead><tr><th style="width:30%">Design choice</th><th style="width:32%">Why it suits the problem</th><th style="width:24%">Supporting evidence</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>Two oversight rules as a switch</td><td>One person must feel both rules on one task</td><td>Horvitz (1999); Shneiderman (2022)</td><td class="st">implemented</td></tr>
+    <tr><td>Thirty-second undo window</td><td>Long enough to notice, short enough to matter</td><td>Nielsen (1993); A1 gap</td><td class="st">implemented</td></tr>
+    <tr><td>Notify on by default, marked unrequested</td><td>The cost is a default, not a user decision</td><td>Amershi et al. (2019) G11</td><td class="st">implemented</td></tr>
+    <tr><td>Assumptions, no confidence score</td><td>A score cannot be checked; an assumption can</td><td>Lecture 09; Lecture 02</td><td class="st">implemented</td></tr>
+    <tr><td>Five checks before execution</td><td>A well-formed call can still be wrong</td><td>Saltzer &amp; Schroeder (1975)</td><td class="st">implemented</td></tr>
+    <tr><td>Correction message after an undo</td><td>Repair is the work undo shifts, not removes</td><td>A1 gap; Cranshaw et al. (2017)</td><td class="st">planned</td></tr>
+  </tbody>
+</table>
+
+<figure>
+  <svg viewBox="0 0 820 700" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;font-family:Helvetica,Arial,sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4b5563"/>
+    </marker>
+    <style>
+      .box { fill:#fff; stroke:#c2c9d2; stroke-width:1.2; rx:8 }
+      .sim { fill:#f6f7f9; stroke-dasharray:5 3.5 }
+      .plan { fill:#fcfcfd; stroke-dasharray:1.5 3 }
+      .t { font-size:11.5px; font-weight:700; fill:#111827 }
+      .b { font-size:9px; fill:#4b5563 }
+      .e { stroke:#4b5563; stroke-width:1.1; fill:none; marker-end:url(#a) }
+      .el { font-size:8.5px; fill:#6b7280 }
+    </style>
+  </defs>
+
+  <rect class="box" x="20" y="26" width="120" height="56" rx="8"/>
+  <text class="t" x="80" y="59" text-anchor="middle">Person</text>
+
+  <rect class="box" x="200" y="14" width="590" height="92" rx="8"/>
+  <text class="t" x="216" y="36">Interface</text>
+  <text class="b" x="216" y="54">calendar week view · proposal card</text>
+  <text class="b" x="216" y="70">notification ledger · audit log</text>
+  <text class="b" x="216" y="88">renders from state, never from the assistant’s summary</text>
+
+  <rect class="box sim" x="200" y="150" width="290" height="86" rx="8"/>
+  <text class="t" x="216" y="172">Adapter — the model boundary</text>
+  <text class="b" x="216" y="192">rule parser (in use)</text>
+  <text class="b" x="216" y="208">remote adapter (not implemented)</text>
+  <text class="b" x="216" y="226">returns a proposal; cannot execute</text>
+
+  <rect class="box" x="200" y="282" width="290" height="78" rx="8"/>
+  <text class="t" x="216" y="304">Proposal — data, not an action</text>
+  <text class="b" x="216" y="322">object · new slot · attendees</text>
+  <text class="b" x="216" y="340">4 assumptions · parse trace</text>
+
+  <rect class="box" x="200" y="404" width="290" height="86" rx="8"/>
+  <text class="t" x="216" y="426">Five checks</text>
+  <text class="b" x="216" y="446">shape · permission · precondition</text>
+  <text class="b" x="216" y="462">confirmation · idempotency</text>
+  <text class="b" x="216" y="480">fails closed: nothing runs</text>
+
+  <rect class="box" x="200" y="534" width="290" height="72" rx="8"/>
+  <text class="t" x="216" y="556">Engine — the only writer</text>
+  <text class="b" x="216" y="576">execute · tick (time) · undo</text>
+  <text class="b" x="216" y="592">one audit log</text>
+
+  <rect class="box sim" x="560" y="396" width="240" height="70" rx="8"/>
+  <text class="t" x="576" y="418">Calendar service</text>
+  <text class="b" x="576" y="436">simulated · six events, one week</text>
+  <text class="b" x="576" y="452">holds the entry undo restores</text>
+
+  <rect class="box sim" x="560" y="488" width="240" height="70" rx="8"/>
+  <text class="t" x="576" y="510">Notification service</text>
+  <text class="b" x="576" y="528">simulated · six attendees</text>
+  <text class="b" x="576" y="544">opens at 00:04 and 00:09</text>
+
+  <rect class="box" x="560" y="580" width="240" height="64" rx="8"/>
+  <text class="t" x="576" y="602">Notification ledger</text>
+  <text class="b" x="576" y="620">delivered / opened / seen</text>
+  <text class="b" x="576" y="636">what undo cannot reach</text>
+
+  <rect class="box plan" x="20" y="580" width="164" height="64" rx="8"/>
+  <text class="t" x="34" y="602">Correction message</text>
+  <text class="b" x="34" y="620">to attendees who</text>
+  <text class="b" x="34" y="634">already read the change</text>
+
+  <path class="e" d="M140,54 L196,54"/>
+  <text class="el" x="146" y="48">acts, reads</text>
+
+  <path class="e" d="M345,106 L345,148"/>
+  <text class="el" x="352" y="132">typed request</text>
+
+  <path class="e" d="M345,236 L345,280"/>
+  <text class="el" x="352" y="262">proposal</text>
+
+  <path class="e" d="M345,360 L345,402"/>
+
+  <path class="e" d="M345,490 L345,532"/>
+  <text class="el" x="352" y="516">all five pass</text>
+
+  <path class="e" d="M490,548 L556,448"/>
+  <text class="el" x="470" y="516">write</text>
+
+  <path class="e" d="M490,574 L556,522"/>
+  <text class="el" x="468" y="566">send</text>
+
+  <path class="e" d="M680,558 L680,578"/>
+  <text class="el" x="686" y="574">delivered</text>
+
+  <path class="e" d="M184,612 L556,612"/>
+  <text class="el" x="196" y="606">planned</text>
+
+  <path class="e" d="M800,612 L812,612 L812,60 L792,60"/>
+  <text class="el" x="806" y="350" transform="rotate(-90 806 350)" text-anchor="middle">renders what happened</text>
+
+  <g transform="translate(20,676)">
+    <rect x="0" y="0" width="12" height="12" fill="#fff" stroke="#c2c9d2" rx="2"/>
+    <text class="el" x="17" y="10">implemented</text>
+    <rect x="110" y="0" width="12" height="12" fill="#f6f7f9" stroke="#c2c9d2" stroke-dasharray="4 3" rx="2"/>
+    <text class="el" x="127" y="10">simulated</text>
+    <rect x="205" y="0" width="12" height="12" fill="#fcfcfd" stroke="#c2c9d2" stroke-dasharray="1 2.5" rx="2"/>
+    <text class="el" x="222" y="10">planned</text>
+    <text class="el" x="300" y="10">Arrows show information and control flow; the model never writes state.</text>
+  </g>
+</svg>
+
+  <div class="figcap"><b>Figure 1.</b> Components, flows and status. The adapter proposes, the checks decide, the engine is the only component that writes, and the ledger holds what an undo cannot reach.</div>
+</figure>
+
+<h2>3. Three interactions</h2>
+<p>The figures follow three runs of one request. In Figure 2 the person reviews the proposal and confirms; the updates leave and the ledger shows who has read them. In Figure 3 the same request runs under the undo rule: change and updates happen immediately, and the person undoes at twelve seconds. The entry returns; three attendees keep a time that no longer exists. Figure 4 shows the repair turns — given no day it asks, given an unknown meeting it declines and lists what it can move, given a malformed call it stops.</p>
+
+<figure class="sb">
+  <img src="figs/sb-a.png" alt="Storyboard A">
+  <div class="figcap"><b>Figure 2.</b> The careful path: proposal with its four assumptions, confirmation, and the ledger after the updates are delivered.</div>
+</figure>
+
+<figure class="sb">
+  <img src="figs/sb-b.png" alt="Storyboard B">
+  <div class="figcap"><b>Figure 3.</b> The fast path: change and updates happen before the person looks; the undo restores the entry, not the message.</div>
+</figure>
+
+<figure class="sb">
+  <img src="figs/sb-c.png" alt="Storyboard C">
+  <div class="figcap"><b>Figure 4.</b> Repair: ask when the request is incomplete, decline when the object does not exist, block when the call is malformed.</div>
+</figure>
+
+<h2>4. Development record</h2>
+<p>The build changed three times in ways that matter. The scope moved from a study to a prototype — the compromise this report defends. A replay bug stamped every notification open at the moment of capture, so undo looked simultaneous with reading; opens now record their scheduled time. The result card hard-coded “morning”, so a 2 pm request produced a sentence about a different request; the action now carries its own assumptions. A test then showed the undo window reported as open in confirm mode, which the interface never offered but the engine allowed. Twelve fixed cases run after every change (<code>node tests/run.mjs</code>), and eight states are reachable as <code>?scene=</code> links, which is how the figures were made. An AI assistant drafted the code and the prose; I read each diff, ran the cases and loaded every scene, and the README records the same account.</p>
+<p>The compromise is worth stating plainly. Nothing here measures oversight effort, felt control, or whether a mistake is caught before someone else acts — the three quantities Assignment 1 set out to compare. The prototype replaces measurement with a situation a reader can inspect. The correction message is drawn as planned because sending it well needs a policy the prototype does not have: who to apologise to, in what words, and who signs it. A real model adapter, multiple events and persistence across a reload are also absent.</p>
+
+<h2>References</h2>
+<div class="refs">
+<p>Amershi, S., Weld, D., Vorvoreanu, M., Fourney, A., Nushi, B., Collisson, P., Suh, J., Iqbal, S., Bennett, P. N., Inkpen, K., Teevan, J., Kikin-Gil, R. and Horvitz, E. (2019) ‘Guidelines for human–AI interaction’, <i>Proceedings of CHI ’19</i>, Paper 3. doi:10.1145/3290605.3300233.</p>
+<p>Cranshaw, J., Elwany, E., Newman, T., Kocielnik, R., Yu, B., Soni, S., Teevan, J. and Monroy-Hernández, A. (2017) ‘Calendar.help: designing a workflow-based scheduling agent with humans in the loop’, <i>Proceedings of CHI ’17</i>, pp. 2382–2393. doi:10.1145/3025453.3025780.</p>
+<p>Endacott, C. G. (2024) ‘Enacting machine agency when AI makes one’s day’, <i>Journal of Computer-Mediated Communication</i>, 29(4), zmae011. doi:10.1093/jcmc/zmae011.</p>
+<p>Haggard, P. (2017) ‘Sense of agency in the human brain’, <i>Nature Reviews Neuroscience</i>, 18(4), pp. 196–207. doi:10.1038/nrn.2017.14.</p>
+<p>Horvitz, E. (1999) ‘Principles of mixed-initiative user interfaces’, <i>Proceedings of CHI ’99</i>, pp. 159–166. doi:10.1145/302979.303030.</p>
+<p>Nielsen, J. (1993) <i>Usability Engineering</i>. San Francisco: Morgan Kaufmann.</p>
+<p>Saltzer, J. H. and Schroeder, M. D. (1975) ‘The protection of information in computer systems’, <i>Proceedings of the IEEE</i>, 63(9), pp. 1278–1308. doi:10.1109/PROC.1975.9939.</p>
+<p>Shneiderman, B. (1983) ‘Direct manipulation: a step beyond programming languages’, <i>Computer</i>, 16(8), pp. 57–69. doi:10.1109/MC.1983.1654471.</p>
+<p>Shneiderman, B. (2022) <i>Human-Centered AI</i>. Oxford: Oxford University Press.</p>
+<p>Zhou, J., Roy, A., Gupta, S., Weitekamp, D. and MacLellan, C. J. (2026) ‘When should users check? Modeling confirmation frequency in multi-step agentic AI tasks’, <i>Proceedings of CHI ’26</i>. doi:10.1145/3772318.3790655.</p>
+</div>
+
+<p class="note" style="margin-top:4mm">Repository: github.com/cyanblueskies/iis-A2 · README and design notes: <code>README.md</code>, <code>docs/decisions.md</code> · Module material: Intelligent Interactive Systems, Lectures 02, 04, 09 and 12.</p>
+
+</body>
+</html>
