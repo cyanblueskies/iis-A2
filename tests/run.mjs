@@ -6,7 +6,7 @@
 // is checked by loading each ?scene= link.
 
 import assert from 'node:assert/strict';
-import { createState, execute, isUndoOpen, submitRequest, tick, undo } from '../js/engine.js';
+import { createState, draftCorrection, dropCorrection, execute, isUndoOpen, sendCorrection, submitRequest, tick, undo } from '../js/engine.js';
 import { FIXTURES } from '../js/model.js';
 
 let passed = 0;
@@ -131,6 +131,66 @@ test('a different time changes the assumption text', () => {
     !s.proposal.assumptions.some((a) => a.claim.includes('morning')),
     'no assumption should mention a period word that was not used',
   );
+});
+
+test('a correction cannot be drafted before an undo', () => {
+  const s = createState('undo');
+  submitRequest(s, REQUEST);
+  execute(s);
+  tick(s, 12000);
+  draftCorrection(s);
+  assert.equal(s.action.correction, undefined);
+});
+
+test('a correction needs someone to have read the update', () => {
+  const s = createState('undo');
+  submitRequest(s, REQUEST);
+  execute(s);
+  tick(s, 1000);
+  undo(s);
+  draftCorrection(s);
+  assert.equal(s.action.correction, undefined, 'nobody opened it, so there is nothing to repair');
+});
+
+test('the adapter drafts the correction and the person has not sent it', () => {
+  const s = createState('undo');
+  submitRequest(s, REQUEST);
+  execute(s);
+  tick(s, 12000);
+  undo(s);
+  draftCorrection(s);
+  assert.equal(s.action.correction.recipients, 3);
+  assert.equal(s.action.correction.sentAt, null);
+  assert.ok(s.action.correction.body.includes('Thursday at 10:00'), 'the draft names the restored slot');
+  const opened = s.action.notifications.filter((n) => n.status === 'opened').length;
+  assert.equal(opened, 3, 'drafting changes nothing on the other side');
+});
+
+test('sending marks the recipients and cannot be repeated', () => {
+  const s = createState('undo');
+  submitRequest(s, REQUEST);
+  execute(s);
+  tick(s, 12000);
+  undo(s);
+  draftCorrection(s);
+  sendCorrection(s);
+  const corrected = s.action.notifications.filter((n) => n.status === 'corrected').length;
+  assert.equal(corrected, 3);
+  const sentAt = s.action.correction.sentAt;
+  sendCorrection(s);
+  assert.equal(s.action.correction.sentAt, sentAt, 'a second send is a no-op');
+});
+
+test('a draft can be discarded without sending', () => {
+  const s = createState('undo');
+  submitRequest(s, REQUEST);
+  execute(s);
+  tick(s, 12000);
+  undo(s);
+  draftCorrection(s);
+  dropCorrection(s);
+  assert.equal(s.action.correction, null);
+  assert.equal(s.action.notifications.filter((n) => n.status === 'corrected').length, 0);
 });
 
 console.log(`\n${passed} passed, ${failures.length} failed`);

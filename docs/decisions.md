@@ -51,7 +51,7 @@ Both rules start from the same typed request: *"Move the project review to Frida
 | Ledger as a first-class panel | Makes the irreversible part visible instead of implied | L01 visibility; A1 gap | implemented |
 | Ghost of the previous slot | Change should be legible without reading the log | L01 visibility; L06 gulf of evaluation | implemented |
 | Decline and clarify instead of a best guess | A model has no "I don't know" state unless one is built | L07 repair turns; L08 | implemented |
-| Correction message after undo | Repair is the work that undo shifts rather than removes | A1 gap: restoring an entry does not restore an invitation | planned |
+| Correction message after undo | Repair is the work that undo shifts rather than removes | A1 gap: restoring an entry does not restore an invitation | implemented |
 
 ## 4. Where the Weeks 1–4 concepts land
 
@@ -78,8 +78,7 @@ Both rules start from the same typed request: *"Move the project review to Frida
 - **Implemented:** parser and turn types, proposal card, assumption list, five checks, execution,
   ledger with scripted opens, undo window, expiry, audit log, deterministic `?scene=` replay.
 - **Simulated:** calendar service, attendees, delivery of updates, the model itself.
-- **Planned:** correction message to attendees who already read the old time; multiple events;
-  a session that survives a reload (local storage); keyboard-only path.
+- **Planned:** multiple events; a session that survives a reload (local storage); keyboard-only path.
 
 ## 6. Development log
 

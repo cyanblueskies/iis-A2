@@ -340,14 +340,38 @@ function doneCard(state) {
 function revertedCard(state) {
   const a = state.action;
   const seen = a ? a.notifications.filter((n) => n.status === 'opened').length : 0;
+  const corrected = a && a.correction && a.correction.sentAt;
+
+  let repair = '';
+  if (a && seen > 0) {
+    if (corrected) {
+      repair = `<div class="receipt">
+        <b>Correction sent at ${stamp(a.correction.sentAt)}</b>
+        <span>${esc(a.correction.subject)}</span>
+      </div>`;
+    } else if (a.correction) {
+      repair = `<div class="draft">
+        <div class="draft-hd">Draft · not sent</div>
+        <p class="draft-subject">${esc(a.correction.subject)}</p>
+        <p class="draft-body">${esc(a.correction.body)}</p>
+        <div class="actions">
+          <button class="btn primary" data-act="send-correction">Send to ${a.correction.recipients}</button>
+          <button class="btn" data-act="drop-correction">Discard</button>
+        </div>
+      </div>`;
+    } else {
+      repair = `<div class="repair">
+        <button class="btn" data-act="draft-correction">Draft correction for ${seen}</button>
+        <small>The assistant writes it. You send it.</small>
+      </div>`;
+    }
+  }
+
   return `<div class="result bad">
     <h3>Calendar restored at ${stamp(state.t)}</h3>
     <p>${esc(a.title)} is back on ${DAY_NAME[a.prev.day]} at ${clock(a.prev.start)}.</p>
     ${seen > 0 ? `<p>${seen} of ${a.notifications.length} attendees already opened the update and are holding a time that no longer exists.</p>` : ''}
-    <div class="line">
-      <button class="btn" disabled>Send correction to ${seen}</button>
-      <span class="hint">planned, not built</span>
-    </div>
+    ${repair}
   </div>`;
 }
 
@@ -374,6 +398,12 @@ function ledger(state) {
       return `<div class="person opened">
         <span class="av">${p.initials}</span>
         <span class="who"><b>${esc(p.name)}</b><em>delivered · not opened</em></span>
+      </div>`;
+    }
+    if (note.status === 'corrected') {
+      return `<div class="person corrected">
+        <span class="av">${p.initials}</span>
+        <span class="who"><b>${esc(p.name)}</b><em>corrected at ${stamp(note.correctedAt)}</em></span>
       </div>`;
     }
     const cls = reverted ? 'seen' : 'opened';

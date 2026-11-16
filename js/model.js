@@ -204,6 +204,24 @@ export const FIXTURES = {
   },
 };
 
+/**
+ * Draft the message that follows an undo. This is generation, so it belongs to
+ * the adapter, not to the engine: the assistant writes, the person sends.
+ */
+export function composeCorrection(action, seen) {
+  const day = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday' }[action.to.day];
+  const day2 = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday' }[action.prev.day];
+  const hh = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+  return {
+    subject: `${action.title}: back to ${day2} ${hh(action.prev.start)}`,
+    body:
+      `${action.title} is back on ${day2} at ${hh(action.prev.start)}. ` +
+      `The change to ${day} ${hh(action.to.start)} that I sent earlier is cancelled. ` +
+      `Sorry for the noise — you may have already moved things for the new time.`,
+    recipients: seen,
+  };
+}
+
 // A real adapter would live here. Left unimplemented on purpose: the build has
 // no network calls, no API key and nothing to leak. The signature is the point.
 export const remoteAdapter = {

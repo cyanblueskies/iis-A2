@@ -6,7 +6,7 @@
 // (L12: model proposes, system disposes; every action passes complete mediation).
 
 import { ATTENDEES, EVENTS, NOTIFY_TIMELINE, UNDO_WINDOW_MS } from './data.js';
-import { parseRequest } from './model.js';
+import { composeCorrection, parseRequest } from './model.js';
 import { validateProposal } from './validate.js';
 
 export function createState(mode = 'confirm') {
@@ -232,6 +232,46 @@ export function undoRemaining(state) {
   const a = state.action;
   if (!a) return 0;
   return Math.max(0, UNDO_WINDOW_MS - (state.t - a.appliedAt));
+}
+
+// ---------------------------------------------------------------------------
+// 4. After an undo, repair is the work that undo does not remove. The adapter
+//    drafts the message; sending it is a system decision with a confirmation,
+//    because it is outward-facing and cannot be recalled either.
+// ---------------------------------------------------------------------------
+export function draftCorrection(state) {
+  const a = state.action;
+  if (!a || !a.revertedAt) return;
+  if (a.correction) return;
+
+  const seen = a.notifications.filter((n) => n.status === 'opened').length;
+  if (!seen) return;
+
+  a.correction = { ...composeCorrection(a, seen), draftedAt: state.t, sentAt: null };
+  log(state, `adapter drafted a correction for ${seen} attendees — not sent`, 'model');
+  state.turn = { kind: 'reverted' };
+}
+
+export function sendCorrection(state) {
+  const a = state.action;
+  if (!a || !a.correction || a.correction.sentAt) return;
+
+  const recipients = a.notifications.filter((n) => n.status === 'opened');
+  for (const note of recipients) {
+    note.status = 'corrected';
+    note.correctedAt = state.t;
+  }
+  a.correction.sentAt = state.t;
+
+  log(state, `correction sent to ${recipients.length} attendees`, 'action');
+  log(state, 'they now hold two messages; the first one cannot be unsent', 'warn');
+}
+
+export function dropCorrection(state) {
+  const a = state.action;
+  if (!a || !a.correction || a.correction.sentAt) return;
+  a.correction = null;
+  log(state, 'correction draft discarded', 'info');
 }
 
 export function setMode(state, mode) {

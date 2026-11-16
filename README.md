@@ -18,7 +18,7 @@ update ledger → confirmation or undo. The same task runs under both rules, swi
 checks, execution on a simulated calendar, notification ledger, undo window, audit log, and
 deterministic `?scene=` replay. *Simulated:* the calendar service, the six attendees, update
 delivery and the model (a rule adapter behind the interface a real call would use). *Not built:*
-calendar connectors, real model calls, correction messages after an undo.
+calendar connectors, real model calls, and a session that survives a reload.
 
 ## Stack
 
@@ -41,6 +41,8 @@ right. The undo window runs in real time.
 | `?scene=confirm-done` | confirmed, updates sent, no undo |
 | `?scene=undo-window` | moved, 6 s into the undo window |
 | `?scene=undo-reverted` | undone at 12 s, three attendees already opened it |
+| `?scene=undo-draft` | the adapter has drafted a correction; nothing is sent |
+| `?scene=undo-corrected` | the correction is sent and the ledger records who was written to |
 | `?scene=undo-expired` | window closed at 31 s |
 | `?scene=blocked` | malformed call stopped by the shape check |
 | `?scene=clarify` / `?scene=decline` | repair turns |
@@ -60,7 +62,9 @@ each change is in [`docs/decisions.md`](docs/decisions.md).
 - Checks — shape, permission, precondition, confirmation, idempotency.
 - Engine — execute, tick, undo; one writer, one log.
 - Interface — proposal card, ledger, audit log.
-- Tests — twelve fixed cases; two of them failed first and were fixed.
+- Tests — seventeen fixed cases; two of them failed first and were fixed.
+- Correction flow — after an undo the adapter drafts the message and the person sends it, because
+  repair is the work that undo shifts rather than removes.
 - README — how to run it.
 
 Three real fixes on the way, each found by a check or a screenshot rather than by reading the code:
@@ -82,7 +86,7 @@ lines, and cut the README from a second report to this page.
 ## Files
 
 [`docs/decisions.md`](docs/decisions.md) — design notes, concept mapping, open questions.
-[`docs/screenshots/`](docs/screenshots) — the eight states and three storyboards used in the report.
+[`docs/screenshots/`](docs/screenshots) — the ten states and three storyboards the report draws on.
 [`docs/report/`](docs/report) — the submitted report (`A2-report.pdf`) and the HTML source it was printed from.
 
 No API key is needed and none is committed. A real adapter would read its key from an environment

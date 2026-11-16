@@ -38,13 +38,13 @@
 
 <p class="area">Area 2: Agentic interaction and human oversight</p>
 
-<p class="wc">Word count: 1,281 (main 1,080 + abstract 201)</p>
+<p class="wc">Word count: 1,280 (main 1,081 + abstract 199)</p>
 
 <h2 style="margin-top:0">Abstract</h2>
-<p>When an AI assistant reschedules a shared meeting it changes plans for people who never approved the change. Asking first lets the organiser inspect the change but interrupts them. Undoing afterwards avoids the interruption, but the mistake is then found after attendees have read a time that no longer exists, and restoring a calendar entry does not recall a message already opened. Assignment 1 identified that asymmetry and proposed a study; this project builds the situation instead. A working prototype runs one request under two oversight rules — confirm before acting, and act with a thirty-second undo — against a simulated six-person meeting. The assistant parses the request into a proposal, shows the four assumptions behind it, runs five checks before touching the calendar, and records what each attendee has seen. Undoing at twelve seconds restores the entry and leaves three attendees holding a time that has gone. The interaction, the checks, the ledger and the undo window are implemented; the calendar service, the attendees and the model are simulated; a correction message is planned. The prototype does not measure whether undo reduces oversight effort. It makes the consequence of that choice inspectable, which is what the study would then have to measure.</p>
+<p>When an AI assistant reschedules a shared meeting it changes plans for people who never approved the change. Asking first lets the organiser inspect the change but interrupts them. Undoing afterwards avoids the interruption, but the mistake is then found after attendees have read a time that no longer exists, and restoring a calendar entry does not recall a message already opened. Assignment 1 identified that asymmetry and proposed a study; this project builds the situation instead. A working prototype runs one request under two oversight rules — confirm before acting, and act with a thirty-second undo — against a simulated six-person meeting. The assistant parses the request into a proposal, shows the four assumptions behind it, runs five checks before touching the calendar, and records what each attendee has seen. Undoing at twelve seconds restores the entry and leaves three attendees holding a time that has gone. The checks, the ledger, the undo window and the correction that follows it are implemented; the calendar service, the attendees and the model are simulated. The prototype does not measure whether undo reduces oversight effort. It makes the consequence of that choice inspectable, which is what the study would then have to measure.</p>
 
 <h2>1. What was built, and how far it goes</h2>
-<p>Assignment 1 proposed a laboratory comparison of pre-action approval and post-action undo. Four days and no participants cannot produce it honestly, so the project changed shape: instead of measuring the difference it instantiates both rules on one task, so the asymmetry can be seen rather than argued. One chain is built end to end — typed request, proposal, five checks, executed change, notification ledger, then either a confirmation or a thirty-second undo. Under <b>confirm</b>, nothing happens until the person approves and there is no undo afterwards; under <b>undo</b>, the calendar and six updates change at once, and thirty seconds remain to restore the entry. The calendar service, attendees, delivery and model are simulated; the parser, checks, engine and undo window are real code; a correction message is planned and marked. Figure 1 shows the components and their status.</p>
+<p>Assignment 1 proposed a laboratory comparison of pre-action approval and post-action undo. Four days and no participants cannot produce it honestly, so the project changed shape: instead of measuring the difference it instantiates both rules on one task, so the asymmetry can be seen rather than argued. One chain is built end to end — typed request, proposal, five checks, executed change, notification ledger, then either a confirmation or a thirty-second undo. Under <b>confirm</b>, nothing happens until the person approves and there is no undo afterwards; under <b>undo</b>, the calendar and six updates change at once, and thirty seconds remain to restore the entry. The calendar service, attendees, delivery and model are simulated; the parser, checks, engine, undo window and correction flow are real code. Figure 1 shows the components and their status.</p>
 
 <h2>2. Design rationale</h2>
 
@@ -74,7 +74,7 @@
     <tr><td>Notify on by default, marked unrequested</td><td>The cost is a default, not a user decision</td><td>Amershi et al. (2019) G11</td><td class="st">implemented</td></tr>
     <tr><td>Assumptions, no confidence score</td><td>A score cannot be checked; an assumption can</td><td>Lecture 09; Lecture 02</td><td class="st">implemented</td></tr>
     <tr><td>Five checks before execution</td><td>A well-formed call can still be wrong</td><td>Saltzer &amp; Schroeder (1975)</td><td class="st">implemented</td></tr>
-    <tr><td>Correction message after an undo</td><td>Repair is the work undo shifts, not removes</td><td>A1 gap; Cranshaw et al. (2017)</td><td class="st">planned</td></tr>
+    <tr><td>Correction message after an undo</td><td>Repair is the work undo shifts, not removes</td><td>A1 gap; Cranshaw et al. (2017)</td><td class="st">implemented</td></tr>
   </tbody>
 </table>
 
@@ -141,10 +141,10 @@
   <text class="b" x="576" y="620">delivered / opened / seen</text>
   <text class="b" x="576" y="636">what undo cannot reach</text>
 
-  <rect class="box plan" x="20" y="580" width="164" height="64" rx="8"/>
+  <rect class="box" x="20" y="580" width="164" height="64" rx="8"/>
   <text class="t" x="34" y="602">Correction message</text>
-  <text class="b" x="34" y="620">to attendees who</text>
-  <text class="b" x="34" y="634">already read the change</text>
+  <text class="b" x="34" y="620">drafted by the adapter,</text>
+  <text class="b" x="34" y="634">sent by you to the 3 who read it</text>
 
   <path class="e" d="M140,54 L196,54"/>
   <text class="el" x="146" y="48">acts, reads</text>
@@ -170,7 +170,7 @@
   <text class="el" x="686" y="574">delivered</text>
 
   <path class="e" d="M184,612 L556,612"/>
-  <text class="el" x="250" y="632">planned</text>
+  <text class="el" x="250" y="632">sent</text>
 
   <path class="e" d="M800,612 L812,612 L812,60 L792,60"/>
   <text class="el" x="806" y="350" transform="rotate(-90 806 350)" text-anchor="middle">renders what happened</text>
@@ -180,9 +180,7 @@
     <text class="el" x="17" y="10">implemented</text>
     <rect x="110" y="0" width="12" height="12" fill="#f6f7f9" stroke="#c2c9d2" stroke-dasharray="4 3" rx="2"/>
     <text class="el" x="127" y="10">simulated</text>
-    <rect x="205" y="0" width="12" height="12" fill="#fcfcfd" stroke="#c2c9d2" stroke-dasharray="1 2.5" rx="2"/>
-    <text class="el" x="222" y="10">planned</text>
-    <text class="el" x="300" y="10">Arrows show information and control flow; the model never writes state.</text>
+    <text class="el" x="210" y="10">Arrows show information and control flow; the model never writes state. Planned, not drawn: persistence across a reload.</text>
   </g>
 </svg>
 
@@ -209,7 +207,7 @@
 
 <h2>4. Development record</h2>
 <p>The build changed three times in ways that matter. The scope moved from a study to a prototype — the compromise this report defends. A replay bug stamped every notification open at the moment of capture, so undo looked simultaneous with reading; opens now record their scheduled time. The result card hard-coded “morning”, so a 2 pm request produced a sentence about a different request; the action now carries its own assumptions. A test then showed the undo window reported as open in confirm mode, which the interface never offered but the engine allowed. Twelve fixed cases run after every change (<code>node tests/run.mjs</code>), and eight states are reachable as <code>?scene=</code> links, which is how the figures were made. An AI assistant drafted the code and the prose; I read each diff, ran the cases and loaded every scene, and the README records the same account.</p>
-<p>The compromise is worth stating plainly. Nothing here measures oversight effort, felt control, or whether a mistake is caught before someone else acts — the three quantities Assignment 1 set out to compare. The prototype replaces measurement with a situation a reader can inspect. The correction message is drawn as planned because sending it well needs a policy the prototype does not have: who to apologise to, in what words, and who signs it. A real model adapter, multiple events and persistence across a reload are also absent.</p>
+<p>The compromise is worth stating plainly. Nothing here measures oversight effort, felt control, or whether a mistake is caught before someone else acts — the three quantities Assignment 1 set out to compare. The prototype replaces measurement with a situation a reader can inspect. The correction message is built too: the adapter drafts the words, the person sends them, and the ledger records who was corrected, because a message that leaves the person’s control needs a check of its own. A real model adapter, multiple events and persistence across a reload are also absent.</p>
 
 <h2>References</h2>
 <div class="refs">

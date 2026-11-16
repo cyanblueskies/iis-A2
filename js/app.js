@@ -1,5 +1,5 @@
 import { SAMPLE_REQUESTS } from './data.js';
-import { createState, discard, execute, setMode, submitRequest, tick, toggleNotify, undo } from './engine.js';
+import { createState, discard, draftCorrection, dropCorrection, execute, sendCorrection, setMode, submitRequest, tick, toggleNotify, undo } from './engine.js';
 import { FIXTURES } from './model.js';
 import { focusInput, getInput, mount, setInput, update } from './ui.js';
 
@@ -81,6 +81,21 @@ document.addEventListener('click', (event) => {
   if (act === 'undo') {
     undo(state);
     draw();
+    return;
+  }
+  if (act === 'draft-correction') {
+    draftCorrection(state);
+    draw();
+    return;
+  }
+  if (act === 'send-correction') {
+    sendCorrection(state);
+    draw();
+    return;
+  }
+  if (act === 'drop-correction') {
+    dropCorrection(state);
+    draw();
   }
 });
 
@@ -129,6 +144,27 @@ const SCENES = {
       execute(s);
       tick(s, 12000);
       undo(s);
+    },
+  },
+  'undo-corrected': {
+    mode: 'undo',
+    run: (s) => {
+      submit(s, SAMPLE_REQUESTS[0]);
+      execute(s);
+      tick(s, 12000);
+      undo(s);
+      draftCorrection(s);
+      sendCorrection(s);
+    },
+  },
+  'undo-draft': {
+    mode: 'undo',
+    run: (s) => {
+      submit(s, SAMPLE_REQUESTS[0]);
+      execute(s);
+      tick(s, 12000);
+      undo(s);
+      draftCorrection(s);
     },
   },
   'undo-expired': {
