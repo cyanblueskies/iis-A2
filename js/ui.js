@@ -330,9 +330,9 @@ function doneCard(state) {
   <details class="assump">
     <summary>What it decided for you</summary>
     <ol>
-      <li>Read “morning” as ${clock(a.to.start)} <em>· time-of-day default</em></li>
-      <li>Kept the meeting 60 minutes <em>· inherited duration</em></li>
-      <li>Notified ${a.notifications.length} attendees <em>· assistant default, not requested</em></li>
+      ${(a.assumptions || [])
+        .map((x) => `<li>${esc(x.claim)} <em>· ${esc(x.source)}</em></li>`)
+        .join('')}
     </ol>
   </details>`;
 }

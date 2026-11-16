@@ -47,6 +47,9 @@ right. The undo window runs in real time.
 
 `window.__proto.state` exposes the live state in the console.
 
+Fixed cases, no dependencies: `node tests/run.mjs` runs twelve checks over the engine, the five
+checks and the three repair turns. The same inputs and expectations are re-run after every change.
+
 ## Development record
 
 Six commits, grouped by step; `git log --oneline` reads in the same order. The reasoning behind
@@ -57,11 +60,16 @@ each change is in [`docs/decisions.md`](docs/decisions.md).
 - Checks — shape, permission, precondition, confirmation, idempotency.
 - Engine — execute, tick, undo; one writer, one log.
 - Interface — proposal card, ledger, audit log.
+- Tests — twelve fixed cases; two of them failed first and were fixed.
 - README — how to run it.
 
-One real fix on the way: the first build stamped every notification open at the moment of the
-replay jump, so undo looked simultaneous with reading. Opens now record their scheduled time
-(`00:04`, `00:09`), which the ledger and the log agree on.
+Three real fixes on the way, each found by a check or a screenshot rather than by reading the code:
+
+- Every notification open was stamped at the moment of the replay jump, so undo looked
+  simultaneous with reading. Opens now record their scheduled time (`00:04`, `00:09`).
+- The result card hard-coded "read morning as 09:00", so a 2 pm request produced a sentence that
+  described a different request. The action now carries its own assumptions.
+- `isUndoOpen` returned true in confirm mode, and `undo()` did not care which rule was active.
 
 ## AI assistance
 

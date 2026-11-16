@@ -139,6 +139,7 @@ export function execute(state) {
     prev,
     to: { ...proposal.to },
     appliedAt: state.t,
+    assumptions: proposal.assumptions.map((a) => ({ ...a })),
     notified,
     notifications,
     fired: {},
@@ -193,6 +194,10 @@ export function tick(state, t) {
 export function undo(state) {
   const a = state.action;
   if (!a || a.revertedAt) return;
+  if (state.mode !== 'undo') {
+    log(state, 'undo is not part of this rule: the check was the oversight', 'danger');
+    return;
+  }
 
   if (state.t - a.appliedAt > UNDO_WINDOW_MS) {
     log(state, 'undo refused: the window has closed', 'danger');
@@ -220,7 +225,7 @@ export function undo(state) {
 
 export function isUndoOpen(state) {
   const a = state.action;
-  return Boolean(a && !a.revertedAt && state.t - a.appliedAt <= UNDO_WINDOW_MS);
+  return Boolean(a && state.mode === 'undo' && !a.revertedAt && state.t - a.appliedAt <= UNDO_WINDOW_MS);
 }
 
 export function undoRemaining(state) {
