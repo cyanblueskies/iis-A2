@@ -1,19 +1,80 @@
 # Ask now or undo later?
 
-Prototype for IIS Assignment 2: an AI calendar assistant that reschedules a shared meeting
-under two oversight rules — confirm before acting, or act and undo within 30 seconds.
+Prototype for IIS Assignment 2: an AI calendar assistant that reschedules a shared meeting under
+two oversight rules, built so that the social cost of a post-action undo is observable rather
+than asserted.
+
+**README prose word count: 536 words** (code, commands and file names excluded).
 
 ## Status
 
-Early build. The week view, the request parser, the pre-action checks, the undo window and the
-notification ledger work locally. Documentation, captures and the report follow.
+Working prototype. One chain, done end to end: request → proposal → five checks → action →
+update ledger → confirmation or undo. The same task runs under both rules, switchable top right.
+
+- **Confirm before acting.** Nothing changes until the person confirms; after that there is no undo.
+- **Act, then 30 s to undo.** The change and six updates go out at once; thirty seconds to restore.
+
+*Implemented:* parser and three repair turns, proposal with its assumption list, five pre-action
+checks, execution on a simulated calendar, notification ledger, undo window, audit log, and
+deterministic `?scene=` replay. *Simulated:* the calendar service, the six attendees, update
+delivery and the model (a rule adapter behind the interface a real call would use). *Not built:*
+calendar connectors, real model calls, correction messages after an undo.
+
+## Stack
+
+Vanilla HTML, CSS and ES modules. No framework, no bundler, no dependencies, no build step — the
+point is that a reviewer can read every line. `js/model.js` is the model boundary; `js/validate.js`
+holds the five checks; `js/engine.js` is the only writer; `js/ui.js` renders from state, never
+from the assistant's own claims.
 
 ## Run
 
     cd ask-now-or-undo-later
     python3 -m http.server 8123
 
-Open <http://127.0.0.1:8123>. No dependencies, no build step, no API key.
+Open <http://127.0.0.1:8123>, type a request or click a chip, and switch the rule at the top
+right. The undo window runs in real time.
 
-Deterministic states: `?scene=confirm-proposal`, `?scene=undo-window`, `?scene=undo-reverted`,
-`?scene=undo-expired`.
+| URL | State |
+| --- | --- |
+| `?scene=confirm-proposal` | proposal waiting for confirmation |
+| `?scene=confirm-done` | confirmed, updates sent, no undo |
+| `?scene=undo-window` | moved, 6 s into the undo window |
+| `?scene=undo-reverted` | undone at 12 s, three attendees already opened it |
+| `?scene=undo-expired` | window closed at 31 s |
+| `?scene=blocked` | malformed call stopped by the shape check |
+| `?scene=clarify` / `?scene=decline` | repair turns |
+
+`window.__proto.state` exposes the live state in the console.
+
+## Development record
+
+Six commits, grouped by step; `git log --oneline` reads in the same order. The reasoning behind
+each change is in [`docs/decisions.md`](docs/decisions.md).
+
+- Scaffold and week data — a week view that reads like a calendar.
+- Model boundary — the parser returns a proposal, never an action.
+- Checks — shape, permission, precondition, confirmation, idempotency.
+- Engine — execute, tick, undo; one writer, one log.
+- Interface — proposal card, ledger, audit log.
+- README — how to run it.
+
+One real fix on the way: the first build stamped every notification open at the moment of the
+replay jump, so undo looked simultaneous with reading. Opens now record their scheduled time
+(`00:04`, `00:09`), which the ledger and the log agree on.
+
+## AI assistance
+
+An AI assistant drafted the code, the CSS and this README. What I checked: loaded every `?scene=`
+link and compared the screen against the audit log; read each commit diff before pushing. What I
+changed: removed an invented confidence score from the proposal (it looked calibrated and was
+not), rewrote the notification timestamps, added a compact rule for events too short to hold two
+lines, and cut the README from a second report to this page.
+
+## Files
+
+[`docs/decisions.md`](docs/decisions.md) — design notes, concept mapping, open questions.
+[`docs/screenshots/`](docs/screenshots) — the eight states used in the report.
+
+No API key is needed and none is committed. A real adapter would read its key from an environment
+variable at build time.
