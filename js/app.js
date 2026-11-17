@@ -33,7 +33,11 @@ function ask(text) {
 
   draw();
   ensureClock();
-  focusInput();
+
+  // Keyboard path: the next decision is the action, so it takes focus.
+  const primary = document.querySelector('[data-act="confirm"]');
+  if (primary) primary.focus();
+  else focusInput();
 }
 
 function ensureClock() {
@@ -110,6 +114,20 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && event.target.id === 'ask-input') {
     event.preventDefault();
     ask();
+    return;
+  }
+  if (event.key === 'Escape') {
+    // Escape backs out of whatever the person has open, without touching the calendar.
+    if (state.action && state.action.correction && !state.action.correction.sentAt) {
+      dropCorrection(state);
+      draw();
+      return;
+    }
+    if (state.proposal && !state.action) {
+      discard(state);
+      draw();
+      focusInput();
+    }
   }
 });
 

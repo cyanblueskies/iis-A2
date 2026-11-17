@@ -427,3 +427,11 @@ button { font: inherit; cursor: pointer; }
 .receipt b { color: var(--green); font-size: 12px; }
 .person.corrected { border-color: #bfe3cd; background: var(--green-soft); }
 .person.corrected .who em { color: var(--green); }
+
+/* ---------- focus ---------- */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 7px;
+}
+.ask input:focus-visible { outline-offset: 1px; }

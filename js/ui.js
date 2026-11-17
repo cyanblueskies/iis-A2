@@ -21,7 +21,7 @@ export function mount(root) {
     <div class="spacer"></div>
     <div class="rule">
       <span>Oversight rule</span>
-      <div class="segmented" id="modes">
+      <div class="segmented" id="modes" role="group" aria-label="Oversight rule">
         <button data-act="mode" data-mode="confirm">Confirm before acting</button>
         <button data-act="mode" data-mode="undo">Act, then 30 s to undo</button>
       </div>
@@ -43,7 +43,7 @@ export function mount(root) {
       </div>
     </section>
 
-    <aside class="card">
+    <aside class="card" id="assistant">
       <header>
         <h2>Assistant</h2>
         <span class="hint" id="mode-hint"></span>
@@ -57,7 +57,7 @@ export function mount(root) {
           (t) => `<button data-act="sample" data-text="${esc(t)}">${esc(t)}</button>`,
         ).join('')}
       </div>
-      <div id="assistant-body" class="panel"></div>
+      <div id="assistant-body" class="panel" role="status" aria-live="polite"></div>
       <div class="rulebox" id="rulebox"></div>
     </aside>
   </div>
@@ -108,7 +108,9 @@ export function focusInput() {
 export function update(state) {
   refs.clock.textContent = stamp(state.t);
   for (const b of refs.modes.querySelectorAll('button')) {
-    b.classList.toggle('on', b.dataset.mode === state.mode);
+    const on = b.dataset.mode === state.mode;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', String(on));
   }
   refs.calHint.textContent = `${state.events.length} events · ${state.events.filter((e) => e.shared).length} shared`;
   refs.modeHint.textContent =

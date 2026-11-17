@@ -33,7 +33,11 @@ from the assistant's own claims.
     python3 -m http.server 8123
 
 Open <http://127.0.0.1:8123>, type a request or click a chip, and switch the rule at the top
-right. The undo window runs in real time.
+right. The undo window runs in real time. <http://127.0.0.1:8123/scenes.html> lists every state
+as one click, which is the fastest way to review the interaction.
+
+Keyboard: Tab reaches the request box and the buttons, Enter asks, and Escape backs out of an open
+proposal or an unsent correction draft without touching the calendar.
 
 | URL | State |
 | --- | --- |
@@ -65,6 +69,8 @@ each change is in [`docs/decisions.md`](docs/decisions.md).
 - Tests — seventeen fixed cases; two of them failed first and were fixed.
 - Correction flow — after an undo the adapter drafts the message and the person sends it, because
   repair is the work that undo shifts rather than removes.
+- Review aids — a scenes index and a keyboard path (focus follows the next decision, Escape backs
+  out), so the interaction can be inspected without a mouse and without waiting for timers.
 - README — how to run it.
 
 Three real fixes on the way, each found by a check or a screenshot rather than by reading the code:

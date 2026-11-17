@@ -78,7 +78,7 @@ Both rules start from the same typed request: *"Move the project review to Frida
 - **Implemented:** parser and turn types, proposal card, assumption list, five checks, execution,
   ledger with scripted opens, undo window, expiry, audit log, deterministic `?scene=` replay.
 - **Simulated:** calendar service, attendees, delivery of updates, the model itself.
-- **Planned:** multiple events; a session that survives a reload (local storage); keyboard-only path.
+- **Planned:** multiple events; a session that survives a reload (local storage).
 
 ## 6. Development log
 
