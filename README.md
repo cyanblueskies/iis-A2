@@ -4,7 +4,8 @@ Prototype for IIS Assignment 2: an AI calendar assistant that reschedules a shar
 two oversight rules, built so that the social cost of a post-action undo is observable rather
 than asserted.
 
-**README prose word count: 536 words** (code, commands and file names excluded).
+**README prose word count: 836 words** (code, commands and file names excluded).
+**Submitted release:** `v1.0` — the tag on the latest commit (see Releases).
 
 ## Status
 
@@ -58,7 +59,7 @@ checks and the three repair turns. The same inputs and expectations are re-run a
 
 ## Development record
 
-Six commits, grouped by step; `git log --oneline` reads in the same order. The reasoning behind
+Fourteen commits, grouped by step; `git log --oneline` reads in the same order. The reasoning behind
 each change is in [`docs/decisions.md`](docs/decisions.md).
 
 - Scaffold and week data — a week view that reads like a calendar.

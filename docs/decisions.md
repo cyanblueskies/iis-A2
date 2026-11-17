@@ -36,7 +36,7 @@ Both rules start from the same typed request: *"Move the project review to Frida
 4. Under **undo**, the action runs immediately, six updates go out, and the person has thirty
    seconds. The ledger opens updates at 00:04 and 00:09.
 5. Undo at 00:12 restores *Thursday 10:00*. Three attendees have already read the update; the
-   interface says so, and offers a correction that is not built.
+   interface says so, and offers a correction the adapter drafts and the person sends.
 
 ## 3. Design decisions
 
