@@ -4,8 +4,7 @@ Prototype for IIS Assignment 2: an AI calendar assistant that reschedules a shar
 two oversight rules, built so that the social cost of a post-action undo is observable rather
 than asserted.
 
-**README prose word count: 836 words** (code, commands and file names excluded).
-**Submitted release:** `v1.0` — the tag on the latest commit (see Releases).
+**README prose word count: 821 words** (code, commands and file names excluded).
 
 ## Status
 
