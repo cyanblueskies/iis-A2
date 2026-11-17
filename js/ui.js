@@ -341,7 +341,7 @@ function doneCard(state) {
 
 function revertedCard(state) {
   const a = state.action;
-  const seen = a ? a.notifications.filter((n) => n.status === 'opened').length : 0;
+  const seen = a ? a.notifications.filter((n) => n.openedAt).length : 0;
   const corrected = a && a.correction && a.correction.sentAt;
 
   let repair = '';

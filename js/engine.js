@@ -213,7 +213,7 @@ export function undo(state) {
   log(state, `undo: ${a.title} restored to ${DAY_NAME[a.prev.day]} ${clock(a.prev.start)}`, 'action');
 
   if (a.notified) {
-    const seen = a.notifications.filter((n) => n.status === 'opened').length;
+    const seen = a.notifications.filter((n) => n.openedAt).length;
     const delivered = a.notifications.filter((n) => n.status !== 'none').length;
     log(state, `calendar restored; ${delivered} updates still in inboxes, ${seen} already opened`, seen > 0 ? 'danger' : 'warn');
     if (seen > 0) log(state, `${seen} attendees saw a time that no longer exists — repair is now manual`, 'danger');
@@ -244,7 +244,7 @@ export function draftCorrection(state) {
   if (!a || !a.revertedAt) return;
   if (a.correction) return;
 
-  const seen = a.notifications.filter((n) => n.status === 'opened').length;
+  const seen = a.notifications.filter((n) => n.openedAt).length;
   if (!seen) return;
 
   a.correction = { ...composeCorrection(a, seen), draftedAt: state.t, sentAt: null };
@@ -256,7 +256,7 @@ export function sendCorrection(state) {
   const a = state.action;
   if (!a || !a.correction || a.correction.sentAt) return;
 
-  const recipients = a.notifications.filter((n) => n.status === 'opened');
+  const recipients = a.notifications.filter((n) => n.openedAt);
   for (const note of recipients) {
     note.status = 'corrected';
     note.correctedAt = state.t;

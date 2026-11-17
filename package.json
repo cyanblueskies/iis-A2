@@ -5,6 +5,7 @@
   "description": "Oversight prototype for IIS Assignment 2",
   "scripts": {
     "test": "node tests/run.mjs",
-    "serve": "python3 -m http.server 8123"
+    "serve": "python3 -m http.server 8123",
+    "scenes": "node tests/scenes.mjs"
   }
 }

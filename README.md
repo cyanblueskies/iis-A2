@@ -71,6 +71,10 @@ each change is in [`docs/decisions.md`](docs/decisions.md).
   repair is the work that undo shifts rather than removes.
 - Review aids — a scenes index and a keyboard path (focus follows the next decision, Escape backs
   out), so the interaction can be inspected without a mouse and without waiting for timers.
+- Scene checks — the first run failed on `undo-corrected`: after the correction was sent the panel
+  lost the receipt, because the count of people who had read the update was taken from the current
+  status rather than from whether they had opened it. Counting by `openedAt` fixed it, and the same
+  check now guards every state.
 - README — how to run it.
 
 Three real fixes on the way, each found by a check or a screenshot rather than by reading the code:
