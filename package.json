@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node tests/run.mjs",
     "serve": "python3 -m http.server 8123",
-    "scenes": "node tests/scenes.mjs"
+    "scenes": "node tests/scenes.mjs",
+    "check": "node tests/run.mjs && node tests/scenes.mjs"
   }
 }

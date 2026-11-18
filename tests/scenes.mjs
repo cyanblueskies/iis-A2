@@ -9,7 +9,7 @@
 // Run: node tests/scenes.mjs        (needs python3; skips if Chrome is absent)
 
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -92,7 +92,37 @@ function dump(url) {
   return `${out.stdout || ''}${out.stderr || ''}`;
 }
 
+// The same ten scene names are written down three times: in app.js, in
+// scenes.html and in this file. Three hand-kept lists drift, so check them.
+function sceneNames() {
+  const app = readFileSync(join(ROOT, 'js', 'app.js'), 'utf8');
+  const block = app.slice(app.indexOf('const SCENES = {'), app.indexOf('const params ='));
+  const inApp = [...block.matchAll(/^\s{2}'?([a-z][a-z-]*)'?:\s*\{/gm)].map((m) => m[1]);
+
+  const page = readFileSync(join(ROOT, 'scenes.html'), 'utf8');
+  const inPage = [...page.matchAll(/scene=([a-z][a-z-]*)/g)].map((m) => m[1]);
+
+  return {
+    app: [...new Set(inApp)].sort(),
+    page: [...new Set(inPage)].sort(),
+    test: SCENES.map((s) => s.name).sort(),
+  };
+}
+
 let failed = 0;
+const names = sceneNames();
+const same =
+  names.app.join() === names.page.join() && names.page.join() === names.test.join();
+if (!same) {
+  failed += 1;
+  console.log('FAIL  the three scene lists disagree');
+  console.log('      app.js:  ', names.app.join(', '));
+  console.log('      scenes:  ', names.page.join(', '));
+  console.log('      tests:   ', names.test.join(', '));
+} else {
+  console.log(`ok    the three scene lists agree (${names.test.length} scenes)`);
+}
+
 await waitForServer();
 
 for (const scene of SCENES) {
@@ -111,5 +141,6 @@ for (const scene of SCENES) {
 }
 
 stop();
-console.log(`\n${SCENES.length - failed} passed, ${failed} failed`);
+const checks = SCENES.length + 1; // the ten scenes plus the list check
+console.log(`\n${checks - failed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
