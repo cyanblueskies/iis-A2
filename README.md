@@ -4,7 +4,7 @@ Prototype for IIS Assignment 2: an AI calendar assistant that reschedules a shar
 two oversight rules, built so that the social cost of a post-action undo is observable rather
 than asserted.
 
-**README prose word count: 821 words** (code, commands and file names excluded).
+**README prose word count: 853 words** (code, commands and file names excluded).
 
 ## Status
 
@@ -25,7 +25,8 @@ calendar connectors, real model calls, and a session that survives a reload.
 Vanilla HTML, CSS and ES modules. No framework, no bundler, no dependencies, no build step — the
 point is that a reviewer can read every line. `js/model.js` is the model boundary; `js/validate.js`
 holds the five checks; `js/engine.js` is the only writer; `js/ui.js` renders from state, never
-from the assistant's own claims.
+from the assistant's own claims. The module responsibilities, the dependency direction and where
+to add a check or a turn are in [`docs/architecture.md`](docs/architecture.md).
 
 ## Run
 
@@ -95,6 +96,7 @@ lines, and cut the README from a second report to this page.
 
 ## Files
 
+[`docs/architecture.md`](docs/architecture.md) — modules, flows, the boundary, and how to extend it.
 [`docs/decisions.md`](docs/decisions.md) — design notes, concept mapping, open questions.
 [`docs/screenshots/`](docs/screenshots) — the ten states and three storyboards the report draws on.
 [`docs/report/`](docs/report) — the submitted report (`A2-report.pdf`) and the HTML source it was printed from.
