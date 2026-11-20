@@ -27,6 +27,7 @@ const CHROME_CANDIDATES = [
 const SCENES = [
   { name: 'confirm-proposal', expect: 'Proposed action' },
   { name: 'confirm-done', expect: 'Moved to Friday 09:00' },
+  { name: 'confirm-sprint', expect: '14:00–15:00' },
   { name: 'undo-window', expect: 'Undo restores the calendar entry' },
   { name: 'undo-reverted', expect: 'Calendar restored at 00:12' },
   { name: 'undo-draft', expect: 'Draft' },

@@ -42,5 +42,6 @@ export const UNDO_WINDOW_MS = 30000;
 export const SAMPLE_REQUESTS = [
   'Move the project review to Friday morning',
   'Push the project review to Friday at 2pm',
+  'Move the sprint planning to Wednesday afternoon',
   'Book me a flight to Berlin on Friday',
 ];

@@ -185,6 +185,10 @@ const SCENES = {
       draftCorrection(s);
     },
   },
+  'confirm-sprint': {
+    mode: 'confirm',
+    run: (s) => submit(s, 'Move the sprint planning to Wednesday afternoon'),
+  },
   'undo-expired': {
     mode: 'undo',
     run: (s) => {
