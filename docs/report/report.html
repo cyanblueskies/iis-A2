@@ -38,7 +38,7 @@
 
 <p class="area">Area 2: Agentic interaction and human oversight</p>
 
-<p class="wc">Word count: 1,280 (main 1,081 + abstract 199)</p>
+<p class="wc">Word count: 1,291 (main 1,092 + abstract 199)</p>
 
 <h2 style="margin-top:0">Abstract</h2>
 <p>When an AI assistant reschedules a shared meeting it changes plans for people who never approved the change. Asking first lets the organiser inspect the change but interrupts them. Undoing afterwards avoids the interruption, but the mistake is then found after attendees have read a time that no longer exists, and restoring a calendar entry does not recall a message already opened. Assignment 1 identified that asymmetry and proposed a study; this project builds the situation instead. A working prototype runs one request under two oversight rules — confirm before acting, and act with a thirty-second undo — against a simulated six-person meeting. The assistant parses the request into a proposal, shows the four assumptions behind it, runs five checks before touching the calendar, and records what each attendee has seen. Undoing at twelve seconds restores the entry and leaves three attendees holding a time that has gone. The checks, the ledger, the undo window and the correction that follows it are implemented; the calendar service, the attendees and the model are simulated. The prototype does not measure whether undo reduces oversight effort. It makes the consequence of that choice inspectable, which is what the study would then have to measure.</p>
@@ -75,6 +75,7 @@
     <tr><td>Assumptions, no confidence score</td><td>A score cannot be checked; an assumption can</td><td>Lecture 09; Lecture 02</td><td class="st">implemented</td></tr>
     <tr><td>Five checks before execution</td><td>A well-formed call can still be wrong</td><td>Saltzer &amp; Schroeder (1975)</td><td class="st">implemented</td></tr>
     <tr><td>Correction message after an undo</td><td>Repair is the work undo shifts, not removes</td><td>A1 gap; Cranshaw et al. (2017)</td><td class="st">implemented</td></tr>
+    <tr><td>Session survives a reload</td><td>A demonstration resets; the build says so</td><td>Development experience</td><td class="st">planned</td></tr>
   </tbody>
 </table>
 
@@ -206,7 +207,7 @@
 </figure>
 
 <h2>4. Development record</h2>
-<p>The build changed three times in ways that matter. The scope moved from a study to a prototype — the compromise this report defends. A replay bug stamped every notification open at the moment of capture, so undo looked simultaneous with reading; opens now record their scheduled time. The result card hard-coded “morning”, so a 2 pm request produced a sentence about a different request; the action now carries its own assumptions. A test then showed the undo window reported as open in confirm mode, which the interface never offered but the engine allowed. Twelve fixed cases run after every change (<code>node tests/run.mjs</code>), and eight states are reachable as <code>?scene=</code> links, which is how the figures were made. An AI assistant drafted the code and the prose; I read each diff, ran the cases and loaded every scene, and the README records the same account.</p>
+<p>The build changed three times in ways that matter. The scope moved from a study to a prototype — the compromise this report defends. A replay bug stamped every notification open at the moment of capture, so undo looked simultaneous with reading; opens now record their scheduled time. The result card hard-coded “morning”, so a 2 pm request produced a sentence about a different request; the action now carries its own assumptions. A test then showed the undo window reported as open in confirm mode, which the interface never offered but the engine allowed. Seventeen engine cases and eleven scene checks run after every change (<code>node tests/run.mjs</code>), and eleven states are reachable as <code>?scene=</code> links, which is how the figures were made. An AI assistant drafted the code and the prose; I read each diff, ran the cases and loaded every scene.</p>
 <p>The compromise is worth stating plainly. Nothing here measures oversight effort, felt control, or whether a mistake is caught before someone else acts — the three quantities Assignment 1 set out to compare. The prototype replaces measurement with a situation a reader can inspect. The correction message is built too: the adapter drafts the words, the person sends them, and the ledger records who was corrected, because a message that leaves the person’s control needs a check of its own. A real model adapter, multiple events and persistence across a reload are also absent.</p>
 
 <h2>References</h2>
@@ -223,7 +224,7 @@
 <p>Zhou, J., Roy, A., Gupta, S., Weitekamp, D. and MacLellan, C. J. (2026) ‘When should users check? Modeling confirmation frequency in multi-step agentic AI tasks’, <i>Proceedings of CHI ’26</i>. doi:10.1145/3772318.3790655.</p>
 </div>
 
-<p class="note" style="margin-top:4mm">Repository: github.com/cyanblueskies/iis-A2 · README and design notes: <code>README.md</code>, <code>docs/decisions.md</code> · Module material: Intelligent Interactive Systems, Lectures 02, 04, 09 and 12.</p>
+<p class="note" style="margin-top:4mm">Repository: github.com/cyanblueskies/iis-A2 · README: github.com/cyanblueskies/iis-A2#readme (development record: README.md#development-record; design notes: docs/decisions.md; architecture: docs/architecture.md) · Submitted release: <b>v1.0</b> · Module material: Intelligent Interactive Systems, Lectures 02, 04, 09 and 12.</p>
 
 </body>
 </html>
