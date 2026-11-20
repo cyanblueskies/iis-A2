@@ -38,18 +38,18 @@
 
 <p class="area">Area 2: Agentic interaction and human oversight</p>
 
-<p class="wc">Word count: 1,289 (main 1,090 + abstract 199)</p>
+<p class="wc">Word count: 1,287 (main 1,088 + abstract 199)</p>
 
 <h2 style="margin-top:0">Abstract</h2>
 <p>When an AI assistant reschedules a shared meeting it changes plans for people who never approved the change. Asking first lets the organiser inspect the change but interrupts them. Undoing afterwards avoids the interruption, but the mistake is then found after attendees have read a time that no longer exists, and restoring a calendar entry does not recall a message already opened. Assignment 1 identified that asymmetry and proposed a study; this project builds the situation instead. A working prototype runs one request under two oversight rules — confirm before acting, and act with a thirty-second undo — against a simulated six-person meeting. The assistant parses the request into a proposal, shows the four assumptions behind it, runs five checks before touching the calendar, and records what each attendee has seen. Undoing at twelve seconds restores the entry and leaves three attendees holding a time that has gone. The checks, the ledger, the undo window and the correction that follows it are implemented; the calendar service, the attendees and the model are simulated. The prototype does not measure whether undo reduces oversight effort. It makes the consequence of that choice inspectable, which is what the study would then have to measure.</p>
 
 <h2>1. What was built, and how far it goes</h2>
-<p>Assignment 1 proposed a laboratory comparison of pre-action approval and post-action undo. Four days and no participants cannot produce it honestly, so the project changed shape: instead of measuring the difference it instantiates both rules on one task, so the asymmetry can be seen rather than argued. One chain is built end to end — typed request, proposal, five checks, executed change, notification ledger, then either a confirmation or a thirty-second undo. Under <b>confirm</b>, nothing happens until the person approves and there is no undo afterwards; under <b>undo</b>, the calendar and six updates change at once, and thirty seconds remain to restore the entry. The calendar service, attendees, delivery and model are simulated; the parser, checks, engine, undo window and correction flow are real code. Figure 1 shows the components and their status.</p>
+<p>Assignment 1 proposed a laboratory comparison of pre-action approval and post-action undo. Four days and no participants cannot produce it honestly, so the project changed shape: instead of measuring the difference it instantiates both rules on one task. One chain runs end to end — request, proposal, five checks, executed change, ledger, then either a confirmation or a thirty-second undo. Under <b>confirm</b> nothing happens until the person approves, and there is no undo afterwards; under <b>undo</b> the calendar and six updates change at once, with thirty seconds to restore the entry. The calendar, attendees, delivery and model are simulated; the parser, checks, engine, window and correction are real code. Figure 1 shows the components and their status.</p>
 
 <h2>2. Design rationale</h2>
 
 <h3>The comparison is the artefact</h3>
-<p>Making the two rules a switch rather than a setting is the central choice. Horvitz (1999) frames acting and asking as a decision under uncertainty about attention and the cost of a wrong action, and Shneiderman’s framework keeps automation and human control separate rather than trading one for the other. Neither settles what to do when the cost falls on someone outside the dialogue, and a single-rule artefact could not show it. Two rules on one task let an identical request produce both consequences within a minute.</p>
+<p>Making the two rules a switch rather than a setting is the central choice: it moves the module’s four variables — initiative, inference, visibility and reversibility — on one screen. Horvitz (1999) frames acting and asking as a decision under uncertainty about attention and the cost of a wrong action, and Shneiderman’s framework keeps automation and human control separate rather than trading one for the other. Neither settles what to do when the cost falls on someone outside the dialogue, and a single-rule artefact could not show it.</p>
 
 <h3>The social cost is an object, not a sentence</h3>
 <p>The notification side effect is on by default, marked “not requested” and editable, because the part that escapes control is a policy default, not a decision the person made. Amershi et al. (2019, G11) ask systems to explain why they acted; here the explanation is a list of who has read what. The course’s reversibility-by-visibility distinction (Lecture 12, after Shneiderman, 1983) sets the rule — reversible and visible, do it and show it; irreversible and invisible, confirm — and the ledger is how visibility survives the action.</p>
@@ -58,13 +58,13 @@
 <p>Assignment 1’s sources still frame the choice. Zhou et al. (2026) price a late check as rework inside the task; Cranshaw et al. (2017) and Endacott (2024) show the cost landing outside the task, on invitees and on the organiser’s sense of control; Haggard (2017) explains why restoring an entry does not restore the feeling of having acted. The prototype puts all three on one screen: the rework is the timer, the outside cost is the ledger, the agency is the sentence that three attendees now hold a time that has gone. Assignment 1 feedback asked for tighter source-to-claim links, so each row carries one source.</p>
 
 <h3>The window is a threshold, not a measurement</h3>
-<p>Thirty seconds trades one error for another, and Lecture 04’s signal-detection framing applies: the window does not improve how well the system knows the move is right, only how the two costs are balanced.</p>
+<p>Thirty seconds is a threshold, and Lecture 04’s signal-detection framing applies: the window cannot improve how well the system knows the move is right, only how the two costs are balanced.</p>
 
 <h3>Assumptions instead of a confidence score</h3>
 <p>The proposal reports four assumptions and no score. A number would look calibrated and would not be; four lines the person can check — “morning is 09:00”, “duration kept”, “attendees notified”, “Friday of this week” — are what Lecture 09 calls a specification in which every omitted part becomes a silent decision. Showing them before the action answers Lecture 02’s claim that every inference is a bet.</p>
 
 <h3>The boundary is in code, and the screen is not the claim</h3>
-<p>Five checks — shape, permission, precondition, confirmation, idempotency — run before anything executes, and the result panel is built from the ledger rather than from the assistant’s summary. Lecture 12 separates the model’s proposal from the system’s decision: here the model cannot execute anything, and “done” appears only once the service has said so.</p>
+<p>Five checks — shape, permission, precondition, confirmation, idempotency — run before anything executes, and the result panel is built from the ledger rather than from the assistant’s summary. Dependencies run one way: data, model, checks, engine, interface, so no component can report on another. Lecture 12 separates the model’s proposal from the system’s decision: here the model cannot execute anything, and “done” appears only once the service has said so.</p>
 
 <table>
   <thead><tr><th style="width:30%">Design choice</th><th style="width:32%">Why it suits the problem</th><th style="width:24%">Supporting evidence</th><th>Status</th></tr></thead>
@@ -75,7 +75,7 @@
     <tr><td>Assumptions, no confidence score</td><td>A score cannot be checked; an assumption can</td><td>Lecture 09; Lecture 02</td><td class="st">implemented</td></tr>
     <tr><td>Five checks before execution</td><td>A well-formed call can still be wrong</td><td>Saltzer &amp; Schroeder (1975)</td><td class="st">implemented</td></tr>
     <tr><td>Correction message after an undo</td><td>Repair is the work undo shifts, not removes</td><td>A1 gap; Cranshaw et al. (2017)</td><td class="st">implemented</td></tr>
-    <tr><td>Session survives a reload</td><td>A demonstration resets; the build says so</td><td>Development experience</td><td class="st">planned</td></tr>
+    <tr><td>Session survives a reload</td><td>A demonstration resets by design</td><td>Development experience</td><td class="st">planned</td></tr>
   </tbody>
 </table>
 
@@ -189,26 +189,26 @@
 </figure>
 
 <h2>3. Three interactions</h2>
-<p>The figures follow three runs of one request. In Figure 2 the person reviews the proposal and confirms; the updates leave and the ledger shows who has read them. In Figure 3 the same request runs under the undo rule: change and updates happen immediately, and the person undoes at twelve seconds. The entry returns; three attendees keep a time that no longer exists. Figure 4 shows the repair turns — given no day it asks, given an unknown meeting it declines and lists what it can move, given a malformed call it stops.</p>
+<p>The figures follow three runs of one request. In Figure 2 the person reviews the proposal and confirms; the updates leave and the ledger shows who has read them. In Figure 3 the same request runs under the undo rule: change and updates happen immediately, and the person undoes at twelve seconds. The entry returns; three attendees keep a time that no longer exists. The calendar and ledger here are simulated; the checks and the window are not. Figure 4 shows the repair turns — given no day it asks, given an unknown meeting it declines and lists what it can move, given a malformed call it stops.</p>
 
 <figure class="sb">
   <img src="figs/sb-a.png" alt="Storyboard A">
-  <div class="figcap"><b>Figure 2.</b> The careful path: proposal with its four assumptions, confirmation, and the ledger after the updates are delivered.</div>
+  <div class="figcap"><b>Figure 2.</b> The careful path: proposal with its four assumptions, confirmation, and the ledger after the updates are delivered. Calendar and ledger simulated; the checks are not.</div>
 </figure>
 
 <figure class="sb">
   <img src="figs/sb-b.png" alt="Storyboard B">
-  <div class="figcap"><b>Figure 3.</b> The fast path: change and updates happen before the person looks; the undo restores the entry, not the message.</div>
+  <div class="figcap"><b>Figure 3.</b> The fast path: change and updates happen before the person looks; the undo restores the entry, not the message. Simulated delivery, real undo window.</div>
 </figure>
 
 <figure class="sb">
   <img src="figs/sb-c.png" alt="Storyboard C">
-  <div class="figcap"><b>Figure 4.</b> Repair: ask when the request is incomplete, decline when the object does not exist, block when the call is malformed.</div>
+  <div class="figcap"><b>Figure 4.</b> Repair: ask when the request is incomplete, decline when the object does not exist, block when the call is malformed. The third panel replays a malformed adapter call.</div>
 </figure>
 
 <h2>4. Development record</h2>
-<p>The build changed three times in ways that matter. The scope moved from a study to a prototype — the compromise this report defends. A replay bug stamped every notification open at the moment of capture, so undo looked simultaneous with reading; opens now record their scheduled time. The result card hard-coded “morning”, so a 2 pm request produced a sentence about a different request; the action now carries its own assumptions. A test then showed the undo window reported as open in confirm mode, which the interface never offered but the engine allowed. Seventeen engine cases and eleven scene checks run after every change (<code>node tests/run.mjs</code>), and eleven states are reachable as <code>?scene=</code> links, which is how the figures were made. An AI assistant drafted the code and the prose; I read each diff, ran the cases and loaded every scene.</p>
-<p>The compromise is worth stating plainly. Nothing here measures oversight effort, felt control, or whether a mistake is caught before someone else acts — the three quantities Assignment 1 set out to compare. The prototype replaces measurement with a situation a reader can inspect. The correction message is built too: the adapter drafts the words, the person sends them, and the ledger records who was corrected, because a message that leaves the person’s control needs a check of its own. A real model adapter and persistence across a reload are also absent.</p>
+<p>The build changed four times in ways that matter. The scope moved from a study to a prototype, and the correction flow moved from planned to built once the undo made the missing half obvious. A replay bug stamped every notification open at the moment of capture, so undo looked simultaneous with reading; opens now record their scheduled time. The result card hard-coded “morning”, so a 2 pm request produced a sentence about a different request; the action now carries its own assumptions. A test showed the undo window open in confirm mode, which the interface never offered. Seventeen engine cases and eleven scene checks run after every change, and eleven states are reachable as <code>?scene=</code> links.</p>
+<p>The compromise is worth stating plainly. Nothing here measures oversight effort, felt control, or whether a mistake is caught before someone else acts — the three quantities Assignment 1 set out to compare; the prototype replaces measurement with a situation a reader can inspect. The correction is built because a message that leaves the person's control needs a check of its own. Absent: a real model adapter, and a session that survives a reload. The design decisions are mine; an assistant drafted the code and prose, and I revised both against the tests. No third-party code or images are reused — every figure is a capture of this build.</p>
 
 <h2>References</h2>
 <div class="refs">
