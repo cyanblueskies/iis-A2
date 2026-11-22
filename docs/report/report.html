@@ -101,15 +101,15 @@
 
   <rect class="box" x="200" y="14" width="590" height="92" rx="8"/>
   <text class="t" x="216" y="36">Interface</text>
-  <text class="b" x="216" y="54">calendar week view · proposal card</text>
-  <text class="b" x="216" y="70">notification ledger · audit log</text>
-  <text class="b" x="216" y="88">renders from state, never from the assistant’s summary</text>
+  <text class="b" x="216" y="54">calendar · proposal card</text>
+  <text class="b" x="216" y="70">ledger · audit log</text>
+  <text class="b" x="216" y="88">renders state, not claims</text>
 
   <rect class="box sim" x="200" y="150" width="290" height="86" rx="8"/>
   <text class="t" x="216" y="172">Adapter — the model boundary</text>
   <text class="b" x="216" y="192">rule parser (in use)</text>
-  <text class="b" x="216" y="208">remote adapter (not implemented)</text>
-  <text class="b" x="216" y="226">returns a proposal; cannot execute</text>
+  <text class="b" x="216" y="208">remote adapter: not implemented</text>
+  <text class="b" x="216" y="226">proposal only · no execution</text>
 
   <rect class="box" x="200" y="282" width="290" height="78" rx="8"/>
   <text class="t" x="216" y="304">Proposal — data, not an action</text>
@@ -120,7 +120,7 @@
   <text class="t" x="216" y="426">Five checks</text>
   <text class="b" x="216" y="446">shape · permission · precondition</text>
   <text class="b" x="216" y="462">confirmation · idempotency</text>
-  <text class="b" x="216" y="480">fails closed: nothing runs</text>
+  <text class="b" x="216" y="480">fails closed</text>
 
   <rect class="box" x="200" y="534" width="290" height="72" rx="8"/>
   <text class="t" x="216" y="556">Engine — the only writer</text>
@@ -129,29 +129,29 @@
 
   <rect class="box sim" x="560" y="396" width="240" height="70" rx="8"/>
   <text class="t" x="576" y="418">Calendar service</text>
-  <text class="b" x="576" y="436">simulated · six events, one week</text>
-  <text class="b" x="576" y="452">holds the entry undo restores</text>
+  <text class="b" x="576" y="436">six events · one week</text>
+  <text class="b" x="576" y="452">holds the slot undo restores</text>
 
   <rect class="box sim" x="560" y="488" width="240" height="70" rx="8"/>
   <text class="t" x="576" y="510">Notification service</text>
-  <text class="b" x="576" y="528">simulated · six attendees</text>
-  <text class="b" x="576" y="544">opens at 00:04 and 00:09</text>
+  <text class="b" x="576" y="528">six attendees</text>
+  <text class="b" x="576" y="544">opens at 00:04, 00:09</text>
 
   <rect class="box" x="560" y="580" width="240" height="64" rx="8"/>
   <text class="t" x="576" y="602">Notification ledger</text>
   <text class="b" x="576" y="620">delivered / opened / seen</text>
-  <text class="b" x="576" y="636">what undo cannot reach</text>
+  <text class="b" x="576" y="636">out of undo’s reach</text>
 
   <rect class="box" x="20" y="580" width="164" height="64" rx="8"/>
   <text class="t" x="34" y="602">Correction message</text>
-  <text class="b" x="34" y="620">drafted by the adapter,</text>
-  <text class="b" x="34" y="634">sent by you to the 3 who read it</text>
+  <text class="b" x="34" y="620">drafted by adapter</text>
+  <text class="b" x="34" y="634">sent by person · 3 people</text>
 
   <path class="e" d="M140,54 L196,54"/>
-  <text class="el" x="146" y="48">acts, reads</text>
+  <text class="el" x="146" y="48">acts</text>
 
   <path class="e" d="M345,106 L345,148"/>
-  <text class="el" x="352" y="132">typed request</text>
+  <text class="el" x="352" y="132">request</text>
 
   <path class="e" d="M345,236 L345,280"/>
   <text class="el" x="352" y="262">proposal</text>
@@ -159,7 +159,7 @@
   <path class="e" d="M345,360 L345,402"/>
 
   <path class="e" d="M345,490 L345,532"/>
-  <text class="el" x="352" y="516">all five pass</text>
+  <text class="el" x="352" y="516">pass</text>
 
   <path class="e" d="M490,548 L556,448"/>
   <text class="el" x="470" y="516">write</text>
@@ -181,7 +181,7 @@
     <text class="el" x="17" y="10">implemented</text>
     <rect x="110" y="0" width="12" height="12" fill="#f6f7f9" stroke="#c2c9d2" stroke-dasharray="4 3" rx="2"/>
     <text class="el" x="127" y="10">simulated</text>
-    <text class="el" x="210" y="10">Arrows show information and control flow; the model never writes state. Planned, not drawn: persistence across a reload.</text>
+    <text class="el" x="210" y="10">Arrows: information and control flow. Planned, not drawn: persistence across a reload.</text>
   </g>
 </svg>
 
