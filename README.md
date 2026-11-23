@@ -8,7 +8,7 @@ It continues Assignment 1's question — whether undo can carry the oversight th
 carries, when the change is visible to colleagues — by instantiating both rules on one task
 instead of measuring the difference.
 
-**README prose word count: 895 words** (code, commands and file names excluded).
+**README prose word count: 940 words** (code, commands and file names excluded).
 **Submitted release:** `v1.0` — tagged on this commit (see Releases).
 
 ## Status
@@ -83,13 +83,16 @@ each change is in [`docs/decisions.md`](docs/decisions.md).
   check now guards every state.
 - README — how to run it.
 
-Three real fixes on the way, each found by a check or a screenshot rather than by reading the code:
+Four real fixes on the way, each found by a check, a screenshot or by using the thing:
 
 - Every notification open was stamped at the moment of the replay jump, so undo looked
   simultaneous with reading. Opens now record their scheduled time (`00:04`, `00:09`).
 - The result card hard-coded "read morning as 09:00", so a 2 pm request produced a sentence that
   described a different request. The action now carries its own assumptions.
 - `isUndoOpen` returned true in confirm mode, and `undo()` did not care which rule was active.
+- The `?scene=` pages are frozen so their clocks stay deterministic. If you then typed your own
+  request on one of them, the countdown sat still. Starting a new request now takes over with a
+  clean session and clears the `?scene=` parameter; clicking undo inside a replay still works.
 
 ## AI assistance
 

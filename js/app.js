@@ -14,6 +14,17 @@ function draw() {
   update(state);
 }
 
+// A ?scene= page is a frozen snapshot: deterministic, no timers. The moment the
+// person starts something new, the snapshot is over, so take over with a clean
+// session — otherwise the clock keeps returning early and the countdown sits still.
+function takeOver() {
+  if (!frozen) return;
+  frozen = false;
+  Object.assign(state, createState(state.mode));
+  if (location.search) history.replaceState(null, '', location.pathname);
+  setInput('');
+}
+
 function submit(target, text) {
   target.request = text;
   submitRequest(target, text);
@@ -23,6 +34,7 @@ function ask(text) {
   const value = (text ?? getInput()).trim();
   if (!value) return;
 
+  takeOver();
   setInput(value);
   submitRequest(state, value);
 
@@ -58,11 +70,13 @@ document.addEventListener('click', (event) => {
   const act = el.dataset.act;
 
   if (act === 'mode') {
+    takeOver();
     setMode(state, el.dataset.mode);
     draw();
     return;
   }
   if (act === 'sample') {
+    takeOver();
     setInput(el.dataset.text);
     ask(el.dataset.text);
     return;
