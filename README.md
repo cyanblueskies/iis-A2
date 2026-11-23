@@ -8,7 +8,7 @@ It continues Assignment 1's question — whether undo can carry the oversight th
 carries, when the change is visible to colleagues — by instantiating both rules on one task
 instead of measuring the difference.
 
-**README prose word count: 940 words** (code, commands and file names excluded).
+**README prose word count: 987 words** (code, commands and file names excluded).
 **Submitted release:** `v1.0` — tagged on this commit (see Releases).
 
 ## Status
@@ -83,7 +83,7 @@ each change is in [`docs/decisions.md`](docs/decisions.md).
   check now guards every state.
 - README — how to run it.
 
-Four real fixes on the way, each found by a check, a screenshot or by using the thing:
+Five real fixes on the way, each found by a check, a screenshot or by using the thing:
 
 - Every notification open was stamped at the moment of the replay jump, so undo looked
   simultaneous with reading. Opens now record their scheduled time (`00:04`, `00:09`).
@@ -93,6 +93,9 @@ Four real fixes on the way, each found by a check, a screenshot or by using the 
 - The `?scene=` pages are frozen so their clocks stay deterministic. If you then typed your own
   request on one of them, the countdown sat still. Starting a new request now takes over with a
   clean session and clears the `?scene=` parameter; clicking undo inside a replay still works.
+- The countdown redrew the whole assistant panel every 100 ms, so a real click on Undo could land
+  on two different buttons and never fire. The panel is now patched in place while only the clock
+  moves, and re-rendered only when the state behind it changes.
 
 ## AI assistance
 

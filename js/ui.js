@@ -116,8 +116,26 @@ export function update(state) {
   refs.modeHint.textContent =
     state.mode === 'confirm' ? 'you review before it runs' : 'it runs, you have 30 s to undo';
   refs.cal.innerHTML = calendar(state);
-  refs.body.innerHTML = assistantBody(state);
-  refs.rulebox.innerHTML = ruleBox(state);
+  // Re-rendering the panel every 100 ms destroys the undo button under the
+  // pointer, so a real click lands on two different elements and never fires.
+  // While only the clock moves, patch the countdown in place instead.
+  const sig = [
+    state.mode,
+    state.turn.kind,
+    state.action ? state.action.id : 0,
+    state.action && state.action.revertedAt ? 'reverted' : 'open',
+    state.action && state.action.correction ? (state.action.correction.sentAt ? 'sent' : 'draft') : 'none',
+    state.proposal ? (state.proposal.notify ? 'notify' : 'quiet') : '-',
+    isUndoOpen(state) ? 'ticking' : 'still',
+  ].join('|');
+
+  if (refs.body.dataset.sig !== sig) {
+    refs.body.innerHTML = assistantBody(state);
+    refs.body.dataset.sig = sig;
+    refs.rulebox.innerHTML = ruleBox(state);
+  } else {
+    paintTimer(state);
+  }
   refs.ledger.innerHTML = ledger(state);
   refs.log.innerHTML = auditLog(state);
   const scroller = refs.log;
@@ -134,6 +152,16 @@ function ruleBox(state) {
   return `<b>Rule in force</b>
     The assistant changes the calendar before you see anything, and updates leave at 00:00.
     You have 30 seconds to restore the entry. Updates already opened stay opened.`;
+}
+
+function paintTimer(state) {
+  const count = document.getElementById('undo-count');
+  if (!count) return;
+  const open = isUndoOpen(state);
+  const rem = undoRemaining(state);
+  count.textContent = open ? `${(rem / 1000).toFixed(1)} s` : 'window closed';
+  const bar = document.getElementById('undo-bar');
+  if (bar) bar.style.width = `${Math.max(0, Math.min(100, (rem / UNDO_WINDOW_MS) * 100))}%`;
 }
 
 // ---------------------------------------------------------------- calendar --
@@ -311,8 +339,8 @@ function doneCard(state) {
   const bar = state.mode === 'undo'
     ? `<div class="undo ${open ? '' : 'closed'}">
         <div class="row">
-          <b>${open ? `${(rem / 1000).toFixed(1)} s` : 'window closed'}</b>
-          <div class="bar"><i style="width:${pct}%"></i></div>
+          <b id="undo-count">${open ? `${(rem / 1000).toFixed(1)} s` : 'window closed'}</b>
+          <div class="bar"><i id="undo-bar" style="width:${pct}%"></i></div>
           <button class="btn" data-act="undo" ${open ? '' : 'disabled'}>Undo</button>
         </div>
         <small>${
