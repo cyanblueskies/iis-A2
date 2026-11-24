@@ -8,7 +8,7 @@ It continues Assignment 1's question — whether undo can carry the oversight th
 carries, when the change is visible to colleagues — by instantiating both rules on one task
 instead of measuring the difference.
 
-**README prose word count: 987 words** (code, commands and file names excluded).
+**README prose word count: 1026 words** (code, commands and file names excluded).
 **Submitted release:** `v1.0` — tagged on this commit (see Releases).
 
 ## Status
@@ -36,7 +36,12 @@ to add a check or a turn are in [`docs/architecture.md`](docs/architecture.md).
 ## Run
 
     cd ask-now-or-undo-later
-    python3 -m http.server 8123
+    python3 serve.py
+
+`serve.py` is `http.server` with `Cache-Control: no-store`. A plain `python3 -m http.server`
+sends no cache header, and a browser can then keep running an old `app.js` after an edit — which
+looks like a broken button rather than a stale file. The footer shows a build number for the same
+reason.
 
 Open <http://127.0.0.1:8123>, type a request or click a chip, and switch the rule at the top
 right. The undo window runs in real time. <http://127.0.0.1:8123/scenes.html> lists every state

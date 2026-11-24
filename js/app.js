@@ -3,8 +3,15 @@ import { createState, discard, draftCorrection, dropCorrection, execute, sendCor
 import { FIXTURES } from './model.js';
 import { focusInput, getInput, mount, setInput, update } from './ui.js';
 
+const BUILD = '8';
+document.documentElement.dataset.build = BUILD;
+
 const root = document.getElementById('app');
 mount(root);
+
+// Visible marker, so a stale cache is obvious rather than mysterious.
+const stamp = document.getElementById('build');
+if (stamp) stamp.textContent = `build ${BUILD}`;
 
 const state = createState('confirm');
 let frozen = false;

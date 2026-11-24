@@ -75,7 +75,7 @@ export function mount(root) {
 
   <p class="footnote">
     Prototype for IIS Assignment 2. The calendar, the attendees and the update service are simulated;
-    the parser, the five checks and the undo window are real code. Deep links: <code>?scene=undo-reverted</code>.
+    the parser, the five checks and the undo window are real code. Deep links: <code>?scene=undo-reverted</code> · <span id="build"></span>.
   </p>`;
 
   refs = {
