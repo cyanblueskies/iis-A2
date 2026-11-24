@@ -115,7 +115,13 @@ export function update(state) {
   refs.calHint.textContent = `${state.events.length} events · ${state.events.filter((e) => e.shared).length} shared`;
   refs.modeHint.textContent =
     state.mode === 'confirm' ? 'you review before it runs' : 'it runs, you have 30 s to undo';
-  refs.cal.innerHTML = calendar(state);
+  // Redraw only what changed. Rebuilding the ledger and the log ten times a
+  // second made the page jank and could move a button under the pointer.
+  const calSig = `${state.events.map((e) => e.day + ':' + e.start).join(',')}|${state.action ? state.action.id + (state.action.revertedAt ? 'r' : '') : ''}`;
+  if (refs.cal.dataset.sig !== calSig) {
+    refs.cal.innerHTML = calendar(state);
+    refs.cal.dataset.sig = calSig;
+  }
   // Re-rendering the panel every 100 ms destroys the undo button under the
   // pointer, so a real click lands on two different elements and never fires.
   // While only the clock moves, patch the countdown in place instead.
@@ -136,10 +142,19 @@ export function update(state) {
   } else {
     paintTimer(state);
   }
-  refs.ledger.innerHTML = ledger(state);
-  refs.log.innerHTML = auditLog(state);
-  const scroller = refs.log;
-  scroller.scrollTop = scroller.scrollHeight;
+  const ledgerSig = state.action
+    ? state.action.notifications.map((n) => n.status + (n.openedAt || '')).join(',')
+    : 'none';
+  if (refs.ledger.dataset.sig !== ledgerSig) {
+    refs.ledger.innerHTML = ledger(state);
+    refs.ledger.dataset.sig = ledgerSig;
+  }
+
+  if (refs.log.dataset.sig !== String(state.log.length)) {
+    refs.log.innerHTML = auditLog(state);
+    refs.log.dataset.sig = String(state.log.length);
+    refs.log.scrollTop = refs.log.scrollHeight;
+  }
 }
 
 

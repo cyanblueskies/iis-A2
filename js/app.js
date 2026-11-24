@@ -3,7 +3,7 @@ import { createState, discard, draftCorrection, dropCorrection, execute, sendCor
 import { FIXTURES } from './model.js';
 import { focusInput, getInput, mount, setInput, update } from './ui.js';
 
-const BUILD = '8';
+const BUILD = '9';
 document.documentElement.dataset.build = BUILD;
 
 const root = document.getElementById('app');
@@ -71,9 +71,7 @@ function ensureClock() {
   }, 100);
 }
 
-document.addEventListener('click', (event) => {
-  const el = event.target.closest('[data-act]');
-  if (!el) return;
+function actOn(el) {
   const act = el.dataset.act;
 
   if (act === 'mode') {
@@ -122,6 +120,25 @@ document.addEventListener('click', (event) => {
     dropCorrection(state);
     draw();
   }
+}
+
+// Act on press, not on release. A click needs the same element under the pointer
+// at press and release; anything that repaints in between swallows it.
+let lastPointer = 0;
+document.addEventListener('pointerdown', (event) => {
+  if (event.pointerType === 'mouse' && event.button !== 0) return;
+  const el = event.target.closest('[data-act]');
+  if (!el) return;
+  lastPointer = Date.now();
+  actOn(el);
+});
+
+// Keyboard activation still arrives as a click with detail === 0.
+document.addEventListener('click', (event) => {
+  const el = event.target.closest('[data-act]');
+  if (!el) return;
+  if (Date.now() - lastPointer < 500) return;
+  actOn(el);
 });
 
 document.addEventListener('change', (event) => {

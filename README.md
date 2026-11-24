@@ -8,7 +8,7 @@ It continues Assignment 1's question — whether undo can carry the oversight th
 carries, when the change is visible to colleagues — by instantiating both rules on one task
 instead of measuring the difference.
 
-**README prose word count: 1026 words** (code, commands and file names excluded).
+**README prose word count: 1075 words** (code, commands and file names excluded).
 **Submitted release:** `v1.0` — tagged on this commit (see Releases).
 
 ## Status
@@ -99,8 +99,11 @@ Five real fixes on the way, each found by a check, a screenshot or by using the 
   request on one of them, the countdown sat still. Starting a new request now takes over with a
   clean session and clears the `?scene=` parameter; clicking undo inside a replay still works.
 - The countdown redrew the whole assistant panel every 100 ms, so a real click on Undo could land
-  on two different buttons and never fire. The panel is now patched in place while only the clock
-  moves, and re-rendered only when the state behind it changes.
+  on two different buttons and never fire. Three things changed: the panel is patched in place
+  while only the clock moves; the ledger and the log are redrawn only when their contents change
+  (they were being rebuilt ten times a second, which made the page jank); and every control now
+  acts on `pointerdown` rather than waiting for a `click` that a repaint can swallow. The footer
+  carries a build number so a stale cache looks like a stale cache.
 
 ## AI assistance
 
