@@ -1,6 +1,6 @@
 # Ask now or undo later?
 
-**README prose word count: 287** (code and setup commands excluded).
+**README prose word count: 360** (code and setup commands excluded).
 **Submitted code release:** [`v1.0`](https://github.com/cyanblueskies/iis-A2/releases/tag/v1.0), commit [`5d4cf6e`](https://github.com/cyanblueskies/iis-A2/commit/5d4cf6e37f829efed5f0600bd2557481294e8503).
 
 An interactive prototype for rescheduling a shared meeting under two rules: confirm first, or act immediately with a 30-second undo. It makes the effects inspectable; it does not measure user performance.
@@ -38,4 +38,6 @@ Key decisions are traceable in the commits: [parse requests into proposals](http
 
 ## AI assistance
 
-I used DeepSeek to draft parser, interaction and CSS code. I removed its unsupported confidence score and kept four explicit assumptions instead. I checked the revised behaviour by replaying scenes and comparing them with the audit log, then ran the engine and scene checks. No third-party code or images are reused.
+I used DeepSeek to draft parser, interaction and CSS code. For the parser, I kept the output as a proposal with four visible assumptions; the engine runs its checks and waits for confirmation before changing the calendar. I removed the generated confidence score because the prototype had no evidence to support it. I checked that confirmation is required and that the assumptions remain visible after execution.
+
+For the undo interaction, I kept calendar restoration separate from notifications: undo does not erase updates that attendees have already opened, and the correction stays a draft until the person chooses to send it. I checked the notification and draft/send cases in the engine checks and replayed the undo scenes. No third-party code or images are reused.
